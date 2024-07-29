@@ -1,0 +1,21 @@
+#!/bin/sh
+
+PREFIX="__PREFIX__."
+SERVER="__CARBON_SERVER__"
+PORT="__CARBON_PORT__"
+
+case $SEND in
+  1) CMD="nc $SERVER $PORT" ;;
+  *) CMD="cat" ;;
+esac
+
+while true
+do
+    TIME=$(date +%s)
+    /usr/local/bin/openwrt_cm4_stats.sh | awk -v p=$PREFIX -v t=$TIME '{print p $0 " " t}' | $CMD
+
+    # sleep until next full minute
+    sleep $((60 - $(date -u +%-S)))
+done
+
+exit 0

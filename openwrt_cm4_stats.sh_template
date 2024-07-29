@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Author: Dale King
+# SCM: https://github.com/daleking/openwrt_cm4_stats
+
+# For OpenWRT on Raspberry Pi CM4 with PPPoE WAN
+
+#
+# Uptime and CPU Idle
+#
+cat /proc/uptime | awk '{print "uptime "$1"\nidletime "$2}'
+
+#
+# PPPoE statistics
+#
+P=/sys/class/net/__PPPOE_WAN__/statistics
+echo -n "carrier "; cat $P/../carrier
+for i in rx_bytes rx_dropped rx_errors rx_packets \
+         tx_bytes tx_dropped tx_errors tx_packets
+do
+	echo -n "$i " ; cat $P/$i
+done
+
+#
+# rpi cm4 vcgencmd statistics
+#
+CPUFREQ=$(vcgencmd measure_clock arm | awk -F'=' '{printf "%0d\n", $2/1000000}')
+echo "rpi.cpu_freq_mhz $CPUFREQ"
+
+CPUTEMPC=$(vcgencmd measure_temp | awk -F"=|\'" '{print $2}')
+echo "rpi.cpu_tempc $CPUTEMPC"
+
+printf "%d" $(vcgencmd get_throttled | awk -F'=' '{print $2}') | awk '{
+  printf "rpi.under_voltage_detected %d\n",              and($1, 1)
+  printf "rpi.arm_frequency_capped %d\n",                and(rshift($1, 1), 1)
+  printf "rpi.currently_throttled %d\n",                 and(rshift($1, 2), 1)
+  printf "rpi.soft_temperature_limit_active %d\n",       and(rshift($1, 3), 1)
+ #printf "rpi.under_voltage_has_occurred %d\n",          and(rshift($1, 16), 1)
+ #printf "rpi.arm_frequency_capping_has_occurred %d\n",  and(rshift($1, 17), 1)
+ #printf "rpi.throttling_has_occurred %d\n",             and(rshift($1, 18), 1)
+ #printf "rpi.soft_temperature_limit_has_occurred %d\n", and(rshift($1, 19), 1)
+}'
