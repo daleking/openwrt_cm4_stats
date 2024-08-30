@@ -40,4 +40,4 @@ chmod 750 local_stats
 ssh root@$ROUTER "mkdir -p /usr/local/bin/ && chmod 755 /usr/local/bin"
 scp -p openwrt_cm4_stats.sh openwrt_cm4_stats_run.sh root@$ROUTER:/usr/local/bin/
 scp local_stats root@$ROUTER:/etc/init.d/
-ssh root@$ROUTER "service local_stats stop ; sleep 1 ; service local_stats start ; sleep 1 ; ps w | grep openwrt_cm4_stats_run"
+ssh root@$ROUTER "/etc/init.d/local_stats enable ; service local_stats stop ; sleep 1 ; service local_stats start ; sleep 1 ; ps w | grep openwrt_cm4_stats_run"
