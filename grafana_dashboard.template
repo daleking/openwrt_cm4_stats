@@ -410,7 +410,7 @@
           },
           "hide": false,
           "refId": "A",
-          "target": "scale(offset(scale(summarize(nonNegativeDerivative(__PREFIX__.idletime), \"1min\"),-0.25), 60),1.6667)",
+          "target": "offset(scale(perSecond(__PREFIX__.idletime), -25), 100)",
           "textEditor": true
         }
       ],
